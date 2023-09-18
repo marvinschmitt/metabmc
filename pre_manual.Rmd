@@ -1,0 +1,132 @@
+---
+title: "Manual-like-document"
+author: "Yuga Hikida"
+date: "2023-09-07"
+output:
+  pdf_document: default
+  html_document: default
+---
+seed = 592897325
+
+We think about choosing model among AR(1), MA(1), and ARMA(1,1) which we name as m1, m2, and m3.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE, include = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+```{r}
+library(brms)
+```
+
+
+```{r}
+data("LakeHuron")
+LakeHuron <- as.data.frame(LakeHuron)
+fit1 <- brms::brm(x ~ arma(p=1, q=0), data=LakeHuron, save_pars = brms::save_pars(all = TRUE), prior = brms::set_prior("normal(0,1)", class="ar"))
+fit2 <- brms::brm(x ~ arma(p=0, q=1), data=LakeHuron, save_pars = brms::save_pars(all = TRUE), prior = brms::set_prior("normal(0,1)", class="ma"))
+fit3 <- brms::brm(x ~ arma(p=1, q=1), data=LakeHuron, save_pars = brms::save_pars(all = TRUE), prior = brms::set_prior("normal(0,1)", class=c("ar", "ma")))
+```
+
+# Concept of Meta-Uncertainty
+
+We can calculate posterior model probability from fitted model.
+```{r}
+pmp_obs <- brms::do_call(post_prob, list(fit1, fit2, fit3))
+print(pmp_obs) # output: 1.583931e-01 1.346934e-09 8.416069e-01 
+```
+
+We obtain strong favour for m3 with posterior model probability (pmp) of approximately 0.84.
+However, this pmp based on observed data have uncertainty due to limited data available.
+Now, we want to generate simulated data and calculate pmp in order to get distribution of pmp.
+
+Since any Bayesian model with proper prior is generative, we can obtain simulated data given model and (proper) prior.
+For example, simulated data from m3 can be obtained by:
+
+```{r}
+prior_fit <- brm(x ~ arma(p=1, q=1), data=LakeHuron, sample_prior="only", iter = 10000 + 10, warmup = 10000, refresh = 0, prior = set_prior("normal(0,1)", class=c("ar", "ma")))
+sim <- posterior_predict(prior_fit, ndraws = 1)
+c(sim)[1:3] # [1] 579.0629 581.1956 582.6099 (first 3 data)
+```
+Here 10 indicates number of parameter sampled from prior distribution. 
+Note that we are 100% sure that true model is m3.
+Given parameter, we can obtain simulated data. This simulated data can be used to calculate simulated pmp for all three candidates of models just like we did for observed data.
+
+```{r}
+sim_df <- LakeHuron
+sim_df$x <- c(sim)
+fit1_sim <- brm(x ~ arma(p=1, q=0), data=sim_df, prior = set_prior("normal(0,1)", class="ar"), save_pars = save_pars(all = TRUE))
+fit2_sim <- brm(x ~ arma(p=0, q=1), data=sim_df, prior = set_prior("normal(0,1)", class="ma"), save_pars = save_pars(all = TRUE))
+fit3_sim <- brm(x ~ arma(p=1, q=1), data=sim_df, prior = set_prior("normal(0,1)", class=c("ar", "ma")), save_pars = save_pars(all = TRUE))
+```
+
+Now we can calculate pmp from model fit with simulated data.
+
+```{r}
+pmp_sim <- brms::do_call(post_prob, list(fit1_sim, fit2_sim, fit3_sim))
+print(pmp_sim) # output: 8.689345e-01 1.199435e-06 1.310643e-01 
+```
+
+Even though we certainly know data is coming from m3, we did not get p(m3) = 1 due to limited number of data.
+Rather, we get p(m3) < p(m1). This suggest that the pmp obtaind from observed data p(m3) = 0.84 might be overconfident towards m3 (might be due to luck?).
+
+Note that the result differs by machine so you will get different value.
+
+We can repeat this process to obtain distribution of pmp given true model set as m3.
+We can do this for m1 and m2 as well.
+Then, we obtain three (model-implied) pmp distributions.
+Finally, we can combine these three distribution and observed pmp to obtain predictive mixture distributions (weighting three distribution by observed pmp).
+
+This predictive mixture distributions expresses distribution of PMPs for a new data set. Thus, this provide a notion of the reproducibility or replicability of a given model comparison result with regard to a subsequent study.
+
+# Usage of package
+
+Firstly, we need to fit model using brms. This is already done. Please make sure
+
+1. All prior distribution is specified to be proper.
+2. save_pars = save_pars(all = TRUE)
+
+for the consequent process.
+
+Now we can obtain (model-implied) posterior model probability distributions for all the model and predictive mixture distributions using meta_uncertainty function (currently only supported for three models). We simply iput three fitted model as arguments with additional specification. 
+
+Note that this will take around 20 mins so we recommend you to take coffee break until it is done.
+
+```{r}
+meta_uncertainty_fit <- meta_uncertainty(fit1, fit2, fit3, n_sim=10, warmup=1000)
+```
+
+Now we can obtain all the quantity of interest within the framework of meta-uncertainty
+
+## Plot PMPs
+
+PMPs with simulated data.
+```{r}
+plot_simulated_pmp(meta_uncertainty_fit)
+```
+
+Model implied PMP distribution along with PMPs for all three models can be visualized as follow.
+
+```{r}
+plot_meta_model_density(meta_uncertainty_fit)
+```
+
+Argument n_sim controls how many simulation to be conducted in total. In this case, n_sim=10.
+Then, true model is sampled with uniform distribution by default.
+In this case, 2 for m1, 5 for m2, 3 for m3 respectivly.
+
+## Plot predictive mixture distribution 
+
+Predictive mixture distribution along with pmp for observed data can be visualized as follow.
+```{r}
+plot_predictive_mixture(meta_uncertainty_fit)
+```
+It can be seen that observed pmp is not align with higher density area in predictive mixture.
+This support the conclusion that observed pmp is actually overconfident.
+
+
+
+
+
+
