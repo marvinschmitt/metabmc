@@ -20,7 +20,6 @@ get_meta_model_posteriors <- function(data, n_posterior_draws) {
     silent = 2
   )
 
-
   fit2 <- brms::brm(
     pmp ~ 1,
     data = dplyr::filter(data, true_model_idx == 2),
@@ -33,7 +32,6 @@ get_meta_model_posteriors <- function(data, n_posterior_draws) {
     refresh = 0,
     silent = 2
   )
-
 
   fit3 <- brms::brm(
     pmp ~ 1,
@@ -53,7 +51,6 @@ get_meta_model_posteriors <- function(data, n_posterior_draws) {
   prep_1 = get_prep(fit1, newdata = new_data)
   prep_2 = get_prep(fit2, newdata = new_data)
   prep_3 = get_prep(fit3, newdata = new_data)
-
 
   mu_post_1 = brms:::get_Mu(prep_1, 1)
   Sigma_post_1 = brms:::get_Sigma(prep_1, 1, cor_name = "lncor")
