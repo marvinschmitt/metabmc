@@ -6,7 +6,7 @@
 #' @return List of posterior draws for each model
 #' @export
 get_meta_model_posteriors <- function(data, n_posterior_draws) {
-
+  suppress_mwo(
   fit1 <- brms::brm(
     pmp ~ 1,
     data = dplyr::filter(data, true_model_idx == 1),
@@ -18,8 +18,8 @@ get_meta_model_posteriors <- function(data, n_posterior_draws) {
     warmup = 1000,
     refresh = 0,
     silent = 2
-  )
-
+  ))
+  suppress_mwo(
   fit2 <- brms::brm(
     pmp ~ 1,
     data = dplyr::filter(data, true_model_idx == 2),
@@ -31,8 +31,9 @@ get_meta_model_posteriors <- function(data, n_posterior_draws) {
     warmup = 1000,
     refresh = 0,
     silent = 2
-  )
+  ))
 
+  suppress_mwo(
   fit3 <- brms::brm(
     pmp ~ 1,
     data = dplyr::filter(data, true_model_idx == 3),
@@ -44,7 +45,7 @@ get_meta_model_posteriors <- function(data, n_posterior_draws) {
     warmup = 1000,
     refresh = 0,
     silent = 2
-  )
+  ))
 
   new_data = data.frame(x = c(1:3))
 

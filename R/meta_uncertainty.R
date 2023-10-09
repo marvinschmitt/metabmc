@@ -1,4 +1,4 @@
-#' Fit Meta Uncertainty model
+#' Fit Meta Uncertainty model. Given brms
 #' @param ... brmsfit object
 #' @param formula_list List of brmsformula
 #' @param prior_list List of vector of prior
@@ -41,9 +41,13 @@ meta_uncertainty <- function(..., formula_list, prior_list, family_list = rep(NU
   meta_model_param <- extract_meta_model_param(meta_model_posteriors)
 
   # Predictive mixture
-  ## calculate observed pmp
   message("Start obtaining pmp with observed data")
-  pmp_obs <- brms::do_call(brms::post_prob, brmsfit_list)
+  suppress_mwo(
+  pmp_obs <- brms::do_call(brms::post_prob, brmsfit_list))
+  if(any(is.na(pmp_obs))){
+    stop("Posterior model probability takes NA. Try rerunning with more samples.")
+  }
+
   message("Start obtaining predictive mixture distribution")
   mixture_function <- create_mixture_function(pmp_obs, meta_model_param)
 

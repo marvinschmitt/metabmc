@@ -45,6 +45,7 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
     brms_arg_list[[j]]$prior <- prior_list[[j]]
     brms_arg_list[[j]]$data <- data
     brms_arg_list[[j]]$family <- family_list[[j]]
+    brms_arg_list[[j]]$silent <- 2
     brmsfit_list[[j]] <- brms::do_call(brms::brm, brms_arg_list[[j]])
   }
   return(brmsfit_list)
@@ -55,6 +56,7 @@ simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup){
     resp <- brmsfit_list[[1]]$formula$resp
     dat <- brmsfit_list[[1]]$data
     simulated_data_matrix <- matrix(data = NA, nrow = n_sim, ncol = nrow(dat))
+    suppress_mwo(
     for (j in 1:n_model){
       n_sim_model_j <- unname(table(pmp_sim$true_model_idx)[j])
       prior_predictive_fit <- stats::update(brmsfit_list[[j]],
@@ -66,7 +68,7 @@ simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup){
                                             silent = 2)
       simulated_quantities <- brms::posterior_predict(prior_predictive_fit, ndraws = n_sim_model_j, refresh=0, silent=2)
       simulated_data_matrix[which(pmp_sim$true_model_idx == j), ] <- simulated_quantities
-    }
+    })
     simulated_data_matrix
 }
 
@@ -81,23 +83,23 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
       ## combine simulated data and predetermined data
       simulated_data[, resp] <- simulated_data_matrix[k, ]
       fit_sim <- list()
+      suppress_mwo(
       for (j in 1:n_model){
         fit_sim[[j]] <- stats::update(brmsfit_list[[j]],
                                       newdata = simulated_data,
                                       save_pars = brms::save_pars(all = TRUE),
                                       refresh = 0,
                                       silent = 2)
+      })
+      suppress_mwo(
+      pmp <- brms::do_call(brms::post_prob, fit_sim)
+      )
+
+      cat(pmp)
+
+      if(any(is.na(pmp))){
+        stop("Posterior model probability takes NA. Try rerunning with more samples.")
       }
-      pmp <- rep(NA, n_model)
-      count <- 0
-      while (any(is.na(pmp))){
-        pmp <- brms::do_call(brms::post_prob, fit_sim)
-        count <- count + 1
-        if (count >= 5){
-          stop("Posterior keep taking NA. Reconsider your model.")
-        }
-      }
-      count <- 0
 
       for (j in 1:n_model){
         col_name <- paste0("pmp", j)
@@ -107,6 +109,7 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
 
     ## create nested pmp for "meta_model_posteriors"
     pmp_sim$pmp <- with(pmp_sim, as.matrix(pmp_sim[, colnames(pmp_sim)[3:ncol(pmp_sim)]]))
+    cat(pmp_sim$pmp)
     pmp_sim
 }
 
@@ -168,7 +171,6 @@ is.meta_uncertainty_fit <- function(meta_uncertainty_fit){
 #' @inheritParams brms::posterior_predict
 #'
 #' @return prep object
-#' @export
 get_prep <- function(
     object, newdata = NULL, re_formula = NULL, re.form = NULL,
     transform = NULL, resp = NULL, negative_rt = FALSE,
@@ -186,4 +188,14 @@ get_prep <- function(
   )
   return(prep)
 }
+
+
+suppress_mwo <- function(expr){
+  suppressMessages(
+    suppressWarnings(
+      invisible(capture.output(expr, type = "output"))
+    )
+  )
+}
+
 

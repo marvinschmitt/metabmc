@@ -94,7 +94,7 @@ Now we can obtain (model-implied) posterior model probability distributions for 
 Note that this will take around 20 mins so we recommend you to take coffee break until it is done.
 
 ```{r}
-meta_uncertainty_fit <- meta_uncertainty(fit1, fit2, fit3, n_sim=3, warmup=1000)
+meta_uncertainty_fit <- meta_uncertainty(fit1, fit2, fit3, n_sim=3)
 ```
 
 Now we can obtain all the quantity of interest within the framework of meta-uncertainty
