@@ -62,7 +62,7 @@ plot_meta_model_density <- function(meta_uncertainty_fit){
     theme(strip.text = element_text(size = 18))
 }
 #' Plot simulated posterior model probability in ternary plot.
-#' @param meta_uncertainty_fitmeta_uncertainty_fit meta_uncertainty_fit object created by \code{\link{meta_uncertainty}}.  Only the fit with three models is supported.
+#' @param meta_uncertainty_fit meta_uncertainty_fit object created by \code{\link{meta_uncertainty}}.  Only the fit with three models is supported.
 #' @returns Ternary plot
 #' @export
 plot_predictive_mixture <- function(meta_uncertainty_fit){
@@ -94,6 +94,10 @@ plot_predictive_mixture <- function(meta_uncertainty_fit){
       geom = "curve", x = 0.1, y = 0.5, xend = pmp_obs_cartesian[1]-0.02, yend = pmp_obs_cartesian[2]+0.02,
       curvature = .3, arrow = arrow(length = unit(2, "mm"))
     ) +
-    annotate(geom = "text", x = 0.1, y = 0.51, label = TeX(r'($\mathring{\pi})'), hjust = "center", vjust="bottom", size=10) +
+    annotate(geom = "text", x = 0.1, y = 0.51, label = latex2exp::TeX(r'($\mathring{\pi})'), hjust = "center", vjust="bottom", size=10) +
     ggsimplex::geom_simplex_canvas(fontsize=20)
+}
+
+simplex_3d_to_cartesian_2d <- function(simplex_pos){
+  return(simplex_pos %*% matrix(c(0, 0, 1, 0, 0.5, sqrt(3)/2), byrow=TRUE, ncol=2))
 }
