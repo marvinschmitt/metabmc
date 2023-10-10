@@ -12,7 +12,6 @@ sample_true_model <- function(prior_model_prob, n_model, n_sim){
   }
 
   # Preparation
-  message("Start sampling true model unitl all model is sampled at least once")
   pmp_sim <- data.frame(
     k = 1:n_sim,
     true_model_idx = rep(0, n_sim)
@@ -39,6 +38,7 @@ sample_true_model <- function(prior_model_prob, n_model, n_sim){
 create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL, data, brms_arg_list=NULL){
   n_model = length(formula_list)
   brmsfit_list <- list()
+  pb <- txtProgressBar(min = 0, max = n_model, style = 3, width = 50, char = "=")
   for (j in 1:n_model){
     brms::validate_prior(prior_list[[j]], formula_list[[j]], data, family_list[[j]])
     brms_arg_list[[j]]$formula <- formula_list[[j]]
@@ -47,7 +47,9 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
     brms_arg_list[[j]]$family <- family_list[[j]]
     brms_arg_list[[j]]$silent <- 2
     brmsfit_list[[j]] <- brms::do_call(brms::brm, brms_arg_list[[j]])
+    setTxtProgressBar(pb, j)
   }
+  close(pb)
   return(brmsfit_list)
 }
 
@@ -76,10 +78,9 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
     # Level 2: Obtain post model probability from simulated data
     resp <- brmsfit_list[[1]]$formula$resp
     simulated_data <- brmsfit_list[[1]]$data
+    pb <- txtProgressBar(min = 0, max = n_sim, style = 3, width = 50, char = "=")
     for (k in 1:n_sim){
-      message(paste0("\n----------------— Run k = ", k, " ----------------—"))
       true_model_idx = pmp_sim$true_model_idx[k]
-      message(paste0("True model: M", true_model_idx))
       ## combine simulated data and predetermined data
       simulated_data[, resp] <- simulated_data_matrix[k, ]
       fit_sim <- list()
@@ -88,14 +89,13 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
         fit_sim[[j]] <- stats::update(brmsfit_list[[j]],
                                       newdata = simulated_data,
                                       save_pars = brms::save_pars(all = TRUE),
+                                      iter = 5000,
                                       refresh = 0,
                                       silent = 2)
       })
       suppress_mwo(
       pmp <- brms::do_call(brms::post_prob, fit_sim)
       )
-
-      cat(pmp)
 
       if(any(is.na(pmp))){
         stop("Posterior model probability takes NA. Try rerunning with more samples.")
@@ -105,11 +105,11 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
         col_name <- paste0("pmp", j)
         pmp_sim[k, col_name] <- pmp[j]
       }
+      setTxtProgressBar(pb, k)
     }
-
+    close(pb)
     ## create nested pmp for "meta_model_posteriors"
     pmp_sim$pmp <- with(pmp_sim, as.matrix(pmp_sim[, colnames(pmp_sim)[3:ncol(pmp_sim)]]))
-    cat(pmp_sim$pmp)
     pmp_sim
 }
 
