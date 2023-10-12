@@ -1,0 +1,173 @@
+---
+title: "Estimating and visualizing posterior model probability with metabmc"
+author: "Yuga Hikida"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Estimating and visualizing posterior model probability with metabmc}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+
+```{r, SETTINGS-knitr, include=FALSE}
+stopifnot(require(knitr))
+options(width = 90)
+opts_chunk$set(
+  comment = NA,
+  message = FALSE,
+  warning = FALSE,
+  eval = if (isTRUE(exists("params"))) params$EVAL else FALSE,
+  dev = "jpeg",
+  dpi = 100,
+  fig.asp = 0.8,
+  fig.width = 5,
+  out.width = "60%",
+  fig.align = "center"
+)
+library(brms)
+library(metabmc)
+ggplot2::theme_set(theme_default())
+data("LakeHuron")
+LakeHuron <- LakeHuron - mean(LakeHuron)
+```
+
+## Introduction
+
+This vignette provides an introduction on how to estimate and visualize posterior 
+predictive distribution of posterior model probability and predictive mixture 
+model using simulations with **metabmc** (**Meta**-uncertainty in **B**ayesian **M**odel **C**omparison.
+The packages uses **brms** and **Stan** as a backbone to enable estimation of 
+complicated Bayesian model with simple syntax.
+
+Given data $y$ and model $M_j$ $j=1,..,J$, parameterized with $\theta$, we can 
+write marginal likelihood of data $y$ given model $M_j$ as:
+
+$$p(y \mid M_j) =\int_{}^{}\,p(y \mid \theta, M_j)p(\theta \mid M_j) \,d\theta$$
+Using Bayes rule, we can derive posterior model probability for $M_j$ as:
+
+$$\pi_j :=p(M_j \mid y)= \frac{p(y \mid M_j) p(M_j)} {\sum_{M^{\prime} \in \mathcal{M}}p(y \mid M^{\prime}) p(M^{\prime})}$$
+
+The posterior model probabilities (PMPs) represent the uncertainty over the choice of 
+$J$ candidate models. However, they also have uncertainty themselves due to data 
+generating process of $y$ with finite samples. Hence, PMPs obtained from data $y$ 
+could be overconfident / underconfident about which model to be favoured.
+
+With **metabmc**, we can obtain distribution of PMPs using simulated 
+data $y^{s}$ given true model $M*$ and prior distribution $p(\theta)$. 
+We currently support all the framework for three candidate models.
+
+## Posterior distribution of model probability using **metabmc**
+
+Suppose we have some (centered) time series which we want to approximate with 
+either AR(1), MA(1) or ARMA(1,1) model.
+
+```{r}
+plot(LakeHuron, type='l')
+```
+
+We can fit three models using **brms** as follow.
+
+```{r, results='hide'}
+m1 <- bf(x ~ 0 + arma(p=1, q=0))
+m2 <- bf(x ~ 0 + arma(p=0, q=1))
+m3 <- bf(x ~ 0 + arma(p=1, q=1))
+
+prior1 <- c(set_prior("normal(0, .5)", class = "ar"),
+           set_prior("normal(0, .5)", class = "sigma"))
+
+prior2 <- c(set_prior("normal(0, .5)", class = "ma"),
+           set_prior("normal(0, .5)", class = "sigma"))
+
+prior3 <- c(set_prior("normal(0, .5)", class = "ar"),
+           set_prior("normal(0, .5)", class = "ma"),
+           set_prior("normal(0, .5)", class = "sigma"))
+
+fit1 <- brm(m1, data=LakeHuron, prior = prior1, save_pars = save_pars(all = TRUE))
+fit2 <- brm(m2, data=LakeHuron, prior = prior2, save_pars = save_pars(all = TRUE))
+fit3 <- brm(m3, data=LakeHuron, prior = prior3, save_pars = save_pars(all = TRUE))
+```
+
+Estimations of posterior distribution of model probability as well as predictive 
+mixture model can be done using all-in-one function `metabmc`.
+We input three `brmsfit` object as arguments along with other arguments which
+will be discussed later. Note that to estimate posterior model probability later, 
+we need to set the argument `save_pars` accordingly when fitting model with **brms**.
+
+```{r}
+metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
+```
+
+Alternatively, list of prior distribution, brms formulas can be added as 
+arguments. In this case, all the model is fit inside `metabmc` function.
+
+```{r}
+# metabmc_fit <- metabmc(list(m1, m2, m3), list(prior1, prior2, prior3), data = LakeHuron, n_sim=20)
+```
+
+Firstly, we sample model $M^*$ from $J = 3$ candidates from model prior $p(M)$. 
+It is set to be uniform distribution by default indicating all models have equal
+probability of being sampled.
+
+Given model $M^*$, we can obtain simulated data $y^{s}$ and simulated model 
+implied PMPs as above. This can be written as:
+
+$$\mathbf{\overset{s}{\pi}} := (p(M_1 \mid \overset{s}{y}),\ p(M_2 \mid \overset{s}{y}),\ p(M_3 \mid \overset{s}{y}))$$
+We can do this multiple times to get more simulated posterior model probabilities
+from all the models, which will be used to estimate the density. In this case we
+set number of simulation to be $20$ with `n_sim`.
+
+Visualization of simulated PMPs can be obtained as follow.
+
+```{r}
+plot_simulated_pmp(metabmc_fit)
+```
+
+The point in each triangles represent the simulated PMPs implied by each true 
+models.
+
+Given simulated PMPs, we can obtain posterior predictive
+distribution of posterior model probability, which we call as **meta models** as:
+
+$p(\tilde{\pi} \mid \{\overset{s}{\pi}\}_j) = \int_{}^{} p_j(\pi \mid \tau_j) p(\tau_j \mid \{\overset{s}{\pi}\}_j) d \tau_j$
+
+where $\tau_j$ is the parameter for meta model corresponding to model $j$ and
+$\{\overset{s}{\pi}\}_j$ is simulated PMPs implied by $M_j$.
+
+Visualization of estimated meta models can be obtained as follow. Note that we
+currently only support logistic normal distribution.
+
+```{r}
+plot_meta_model_density(metabmc_fit)
+```
+
+The area with high density is displayed in yellow while low density is displayed 
+in purple.
+
+## Predictive mixture model using **metabmc**
+
+Combining meta models and posterior model probabilities obtained from observed
+data $\mathbf{\overset{o}{\pi}} := (\overset{o}{\pi_1}, \overset{o}{\pi_2}, \overset{o}{\pi_3})$, 
+we can construct predictive mixture distribution of posterior model probabilities 
+by taking weighted sum of meta model by observed posterior model probabilities:
+
+$f(\tilde{\pi}):=\sum_{j=1}^{3} \pi^o_j \ p(\pi \mid \{\pi^s\}_j)$
+
+The visualization of estimated predictive mixture model can be obtained as follow.
+
+```{r, warning=FALSE}
+plot_predictive_mixture(metabmc_fit)
+```
+
+The plot shows the predictive mixture model with the position of observed PMPs.
+If observed PMPs locate in the area with low density, it suggest that observed
+PMPs are overconfident. For our models, it does not seems to be the case.
+
+## Reference
+Schmitt, M., Radev, S. T., & Bürkner, P. C. (2023, April). Meta-Uncertainty in 
+Bayesian Model Comparison. In International Conference on Artificial Intelligence 
+and Statistics (pp. 11-29). PMLR.
+

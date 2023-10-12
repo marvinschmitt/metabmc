@@ -3,7 +3,7 @@
 #' @param formula_list List of brmsformula
 #' @param prior_list List of vector of prior
 #' @param family_list List of brmsfamily
-#' @param data Data to fit Meta Uncertainty
+#' @param data Data to fit
 #' @param n_sim Number of simulation to obtain posterior model probability
 #' @param n_posterior_draws Number of posterior draws
 #' @param warmup Number of warmup
@@ -11,10 +11,10 @@
 #' @param eps Small number to be added / subtracted when posterior model probability takes 0 / 1
 #' @param brms_arg_list Additional argument to be passed to brms::brm when fitting model
 #'
-#' @returns meta_uncertainty object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
+#' @returns metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
 #'
 #' @export
-meta_uncertainty <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=100, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-10, brms_arg_list = NULL){
+metabmc <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=100, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-5, brms_arg_list = NULL){
   brmsfit_list <- list(...)
 
   # validate argument and create brmsfit object using formula_list, prior_list, familiy_list and additional arguments
@@ -50,6 +50,6 @@ meta_uncertainty <- function(..., formula_list, prior_list, family_list = rep(NU
   mixture_function <- create_mixture_function(pmp_obs, meta_model_param)
 
   out <- list(pmp_sim = pmp_sim, simulated_data_matrix = simulated_data_matrix, meta_model_param = meta_model_param, pmp_obs = pmp_obs, mixture_function = mixture_function)
-  class(out) <- "meta_uncertainty_fit"
+  class(out) <- "metabmcfit"
   return(out)
 }

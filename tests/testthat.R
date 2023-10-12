@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(metau)
+library(metabmc)
 
-test_check("metau")
+test_check("metabmc")

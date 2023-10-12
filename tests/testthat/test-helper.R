@@ -50,9 +50,9 @@ test_that("zero in pmp is avoided.", {
 })
 
 test_that("simulate_data works", {
-  dat <- data.frame(y = rnorm(10), x = rnorm(10), g = rep(1:5, 2))
+  dat <- data.frame(y = rnorm(10), x = rnorm(10), z = rnorm(10))
   f1 <- brms::bf(y ~ x)
-  f2 <- brms::bf(y ~ 1)
+  f2 <- brms::bf(y ~ z)
   fam1 <- gaussian()
   fam2 <- brms::student()
   brms_arg_list_1 <- list(formula = f1, data = dat, family = fam1, backend = "mock", mock_fit = "1", rename = FALSE)
@@ -78,9 +78,9 @@ test_that("simulate_data works", {
 
 test_that("post_prob_from_sim works", {
   simulate_data_matrix <- matrix(c(rep(1,10), rep(2,10), rep(3,10)), ncol=10, byrow=TRUE)
-  dat <- data.frame(y = rnorm(10), x = rnorm(10), g = rep(1:5, 2))
+  dat <- data.frame(y = rnorm(10), x = rnorm(10), z = rnorm(10))
   f1 <- brms::bf(y ~ x)
-  f2 <- brms::bf(y ~ 1)
+  f2 <- brms::bf(y ~ z)
   fam1 <- gaussian()
   fam2 <- brms::student()
   brms_arg_list_1 <- list(formula = f1, data = dat, family = fam1, backend = "mock", mock_fit = "1", rename = FALSE)

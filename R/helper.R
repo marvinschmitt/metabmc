@@ -38,7 +38,7 @@ sample_true_model <- function(prior_model_prob, n_model, n_sim){
 create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL, data, brms_arg_list=NULL){
   n_model = length(formula_list)
   brmsfit_list <- list()
-  pb <- txtProgressBar(min = 0, max = n_model, style = 3, width = 50, char = "=")
+  pb <- utils::txtProgressBar(min = 0, max = n_model, style = 3, width = 50, char = "=")
   for (j in 1:n_model){
     brms::validate_prior(prior_list[[j]], formula_list[[j]], data, family_list[[j]])
     brms_arg_list[[j]]$formula <- formula_list[[j]]
@@ -47,7 +47,7 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
     brms_arg_list[[j]]$family <- family_list[[j]]
     brms_arg_list[[j]]$silent <- 2
     brmsfit_list[[j]] <- brms::do_call(brms::brm, brms_arg_list[[j]])
-    setTxtProgressBar(pb, j)
+    utils::setTxtProgressBar(pb, j)
   }
   close(pb)
   return(brmsfit_list)
@@ -78,7 +78,7 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
     # Level 2: Obtain post model probability from simulated data
     resp <- brmsfit_list[[1]]$formula$resp
     simulated_data <- brmsfit_list[[1]]$data
-    pb <- txtProgressBar(min = 0, max = n_sim, style = 3, width = 50, char = "=")
+    pb <- utils::txtProgressBar(min = 0, max = n_sim, style = 3, width = 50, char = "=")
     for (k in 1:n_sim){
       true_model_idx = pmp_sim$true_model_idx[k]
       ## combine simulated data and predetermined data
@@ -89,7 +89,6 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
         fit_sim[[j]] <- stats::update(brmsfit_list[[j]],
                                       newdata = simulated_data,
                                       save_pars = brms::save_pars(all = TRUE),
-                                      iter = 5000,
                                       refresh = 0,
                                       silent = 2)
       })
@@ -105,7 +104,7 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
         col_name <- paste0("pmp", j)
         pmp_sim[k, col_name] <- pmp[j]
       }
-      setTxtProgressBar(pb, k)
+      utils::setTxtProgressBar(pb, k)
     }
     close(pb)
     ## create nested pmp for "meta_model_posteriors"
@@ -162,8 +161,8 @@ avoid_error_by_zero_one <- function(nested_pmp, eps){
   nested_pmp
 }
 
-is.meta_uncertainty_fit <- function(meta_uncertainty_fit){
-  class(meta_uncertainty_fit) == "meta_uncertainty_fit"
+is.metabmcfit <- function(metabmcfit){
+  class(metabmcfit) == "metabmcfit"
 }
 
 #' Get prep object
