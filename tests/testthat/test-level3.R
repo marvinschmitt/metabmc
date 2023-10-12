@@ -18,7 +18,7 @@ test_that("level_3 works", {
   mockery::stub(level_3, "create_mixture_function", "mock_mixture_function")
 
   expected_out <- list(pmp_sim = pmp_sim_2, simulated_data_matrix = NULL, meta_model_param = "mock_meta_model_parameter", pmp_obs = pmp_pbs, mixture_function = "mock_mixture_function")
-  class(expected_out) <- "meta_uncertainty_fit"
+  class(expected_out) <- "metabmcfit"
   out <- level_3(pmp_pbs, pmp_sim_1)
   expect_equal(out, expected_out)
 })

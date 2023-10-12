@@ -20,6 +20,6 @@ level_3 <- function(pmp_obs, pmp_sim, n_posterior_draws=1000, eps=1e-10){
   mixture_function <- create_mixture_function(pmp_obs, meta_model_param)
 
   out <- list(pmp_sim = pmp_sim, simulated_data_matrix = NULL, meta_model_param = meta_model_param, pmp_obs = pmp_obs, mixture_function = mixture_function)
-  class(out) <- "meta_uncertainty_fit"
+  class(out) <- "metabmcfit"
   return(out)
 }
