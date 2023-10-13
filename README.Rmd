@@ -66,10 +66,10 @@ fit3 <- brm(m3, data=LakeHuron, prior = prior3, save_pars = save_pars(all = TRUE
 library(metabmc)
 ```
 
-We use brms and Stan as a backbone to enable use to fit complicated Bayesian model
-with simple syntax. To estimate meta models and predictive density, we use all-in-one
-function `metabmc`. We simply input `brmsfit` objects along with a argument 
-specifying the settings for simulations.
+The brms and Stan is used as a backbone to enable user to fit complicated 
+Bayesian model with simple syntax. To estimate meta models and predictive d
+ensity, we use all-in-one function `metabmc`. We simply input `brmsfit` objects 
+along with a argument specifying the settings for simulation.
 
 ```{r, results='hide', eval=FALSE}
 metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
