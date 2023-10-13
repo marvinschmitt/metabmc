@@ -14,7 +14,7 @@
 #' @returns metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
 #'
 #' @export
-metabmc <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=100, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-5, brms_arg_list = NULL){
+metabmc <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=100, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-3, brms_arg_list = NULL){
   brmsfit_list <- list(...)
 
   # validate argument and create brmsfit object using formula_list, prior_list, familiy_list and additional arguments
