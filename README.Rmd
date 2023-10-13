@@ -1,0 +1,100 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# metabmc
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The **metabmc** is R package provide enable user to estimate and visualize
+posterior distribution of model probabilities (meta models) with simulation, 
+and predictive mixture distribution by combining simulation and posterior model 
+probability obtained from observed data. This could enable user to correct 
+overconfidence over specific model in the context of Bayesian Model Comparison.
+
+
+## Installation
+
+You can install the development version of metabmc from [GitHub](https://github.com/) with:
+
+``` {r, eva=FALSE}
+# install.packages("devtools")
+# devtools::install_github("marvinschmitt/metauncertainty")
+```
+
+## How to use metabmc
+
+```{r include=FALSE}
+# library(ggplot2)
+# library(brms)
+```
+
+```{r, results='hide', include=FALSE, eval=FALSE}
+m1 <- bf(x ~ 0 + arma(p=1, q=0))
+m2 <- bf(x ~ 0 + arma(p=0, q=1))
+m3 <- bf(x ~ 0 + arma(p=1, q=1))
+
+prior1 <- c(set_prior("normal(0, .2)", class = "ar"),
+           set_prior("normal(0, .2)", class = "sigma"))
+
+prior2 <- c(set_prior("normal(0, .2)", class = "ma"),
+           set_prior("normal(0, .2)", class = "sigma"))
+
+prior3 <- c(set_prior("normal(0, .2)", class = "ar"),
+           set_prior("normal(0, .2)", class = "ma"),
+           set_prior("normal(0, .2)", class = "sigma"))
+
+fit1 <- brm(m1, data=LakeHuron, prior = prior1, save_pars = save_pars(all = TRUE))
+fit2 <- brm(m2, data=LakeHuron, prior = prior2, save_pars = save_pars(all = TRUE))
+fit3 <- brm(m3, data=LakeHuron, prior = prior3, save_pars = save_pars(all = TRUE))
+```
+
+
+```{r example}
+library(metabmc)
+```
+
+We use brms and Stan as a backbone to enable use to fit complicated Bayesian model
+with simple syntax. To estimate meta models and predictive density, we use all-in-one
+function `metabmc`. We simply input `brmsfit` objects along with a argument 
+specifying the settings for simulations.
+
+```{r, results='hide', eval=FALSE}
+metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
+```
+
+Posterior model probabilities obtained from simulation can be visualized as 
+follow.
+
+```{r,eval=FALSE}
+plot_simulated_pmp(metabmc_fit)
+```
+
+Visualization of estimated meta models can be obtained as follow.
+
+```{r,eval=FALSE}
+plot_meta_model_density(metabmc_fit)
+```
+
+The visualization of estimated predictive mixture model with observed posterior
+model probabilities can be obtained as follow.
+
+```{r,eval=FALSE}
+plot_predictive_mixture(metabmc_fit)
+```
+
+
+
+
