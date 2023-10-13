@@ -37,7 +37,7 @@ plot_meta_model_density <- function(metabmcfit){
                                           latex2exp::TeX("$M_*=M_3$")
                                )
   )
-  meta_model_param <- meta_uncertainty_fit$meta_model_param
+  meta_model_param <- metabmcfit$meta_model_param
   meta_model_param$true_model <- factor(meta_model_param$true_model_idx, levels = c(1,2,3),
                                         labels = c(latex2exp::TeX("$M_*=M_1$"),
                                                    latex2exp::TeX("$M_*=M_2$"),
