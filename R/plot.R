@@ -1,6 +1,9 @@
-#' Plot simulated posterior model probability in ternary plot.
+#' Plot simulated posterior model probability.
 #' @param metabmcfit metabmcfit object created by \code{\link{metabmc}}. Only the fit with three models is supported.
-#' @returns Ternary plot showing simulated posterior model probability from three true model.
+#' @returns Three triangle plot showing simulated posterior model probability from three true models.
+#' @example \dontrun{
+#' plot_simulated_pmp(metabmc_fit)
+#' }
 #' @export
 plot_simulated_pmp <- function(metabmcfit){
   stopifnot(is.metabmcfit(metabmcfit))
@@ -23,10 +26,13 @@ plot_simulated_pmp <- function(metabmcfit){
     ggplot2::theme(strip.text = ggplot2::element_text(size = 18))
 }
 
-#' Plot simulated posterior model probability in ternary plot.
+#' Plot density of metamodels
 #' @param metabmcfit metabmcfit object created by \code{\link{metabmc}}.  Only the fit with three models is supported.
-#' @returns Ternary plot
-#' @export
+#' @returns Three triangle plot of density of meta models (Distribution of posterior model probability)
+#' @example \dontrun{
+#' plot_meta_model_density(metabmc_fit)
+#' }
+#' @exports
 plot_meta_model_density <- function(metabmcfit){
   stopifnot(is.metabmcfit(metabmcfit))
   pmp_sim <- metabmcfit$pmp_sim
@@ -61,9 +67,9 @@ plot_meta_model_density <- function(metabmcfit){
     ggplot2::facet_grid(cols=vars(true_model), labeller = label_parsed) +
     ggplot2::theme(strip.text = element_text(size = 18))
 }
-#' Plot simulated posterior model probability in ternary plot.
+#' Plot predictive mixture model
 #' @param metabmcfit metabmcfit object created by \code{\link{metabmc}}. Only the fit with three models is supported.
-#' @returns Ternary plot
+#' @returns Single ternary plot of density of predictive mixture model along with observed PMPs.
 #' @export
 plot_predictive_mixture <- function(metabmcfit){
   stopifnot(is.metabmcfit(metabmcfit))
@@ -98,6 +104,9 @@ plot_predictive_mixture <- function(metabmcfit){
     ggsimplex::geom_simplex_canvas(fontsize=20)
 }
 
+# Convert position in 3D simplex to position in cartesian coordinate
+# @param simplex_pos vector with size 3
+# @returns vector with size 2
 simplex_3d_to_cartesian_2d <- function(simplex_pos){
   return(simplex_pos %*% matrix(c(0, 0, 1, 0, 0.5, sqrt(3)/2), byrow=TRUE, ncol=2))
 }

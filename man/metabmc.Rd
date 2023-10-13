@@ -2,7 +2,7 @@
 % Please edit documentation in R/metabmc.R
 \name{metabmc}
 \alias{metabmc}
-\title{Fit Meta Uncertainty model. Given brms}
+\title{Fit meta model for posterior model probabilities and predictive mixture model}
 \usage{
 metabmc(
   ...,
@@ -10,7 +10,7 @@ metabmc(
   prior_list,
   family_list = rep(NULL, 3),
   data = NULL,
-  n_sim = 100,
+  n_sim = 20,
   n_posterior_draws = 1000,
   warmup = 5000,
   prior_model_prob = "uniform",
@@ -45,5 +45,10 @@ metabmc(
 metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
 }
 \description{
-Fit Meta Uncertainty model. Given brms
+Fit meta model for posterior model probabilities and predictive mixture model.
+All-in-one function to simulate posterior model probabilities given model specification and prior, estimate density
+over simulated posterior model probabilities (meta models), and estimate predictive mixture model combining meta models
+and observed posterior model probabilities. Currently only three model candidate is supported.
+After fitting the models, results can be visualized using following three functions;
+\code{\link{plot_simulated_pmp}}, \code{\link{plot_meta_model_density}}, and \code{\link{plot_predictive_mixture}}.
 }

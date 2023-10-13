@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot_simulated_pmp}
 \alias{plot_simulated_pmp}
-\title{Plot simulated posterior model probability in ternary plot.}
+\title{Plot simulated posterior model probability.}
 \usage{
 plot_simulated_pmp(metabmcfit)
 }
@@ -10,8 +10,8 @@ plot_simulated_pmp(metabmcfit)
 \item{metabmcfit}{metabmcfit object created by \code{\link{metabmc}}. Only the fit with three models is supported.}
 }
 \value{
-Ternary plot showing simulated posterior model probability from three true model.
+Three triangle plot showing simulated posterior model probability from three true models.
 }
 \description{
-Plot simulated posterior model probability in ternary plot.
+Plot simulated posterior model probability.
 }

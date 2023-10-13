@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot_meta_model_density}
 \alias{plot_meta_model_density}
-\title{Plot simulated posterior model probability in ternary plot.}
+\title{Plot density of metamodels}
 \usage{
 plot_meta_model_density(metabmcfit)
 }
@@ -10,8 +10,8 @@ plot_meta_model_density(metabmcfit)
 \item{metabmcfit}{metabmcfit object created by \code{\link{metabmc}}.  Only the fit with three models is supported.}
 }
 \value{
-Ternary plot
+Three triangle plot of density of meta models (Distribution of posterior model probability)
 }
 \description{
-Plot simulated posterior model probability in ternary plot.
+Plot density of metamodels
 }

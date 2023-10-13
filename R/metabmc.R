@@ -1,4 +1,12 @@
-#' Fit Meta Uncertainty model. Given brms
+#' Fit meta model for posterior model probabilities and predictive mixture model
+#'
+#' Fit meta model for posterior model probabilities and predictive mixture model.
+#' All-in-one function to simulate posterior model probabilities given model specification and prior, estimate density
+#' over simulated posterior model probabilities (meta models), and estimate predictive mixture model combining meta models
+#' and observed posterior model probabilities. Currently only three model candidate is supported.
+#' After fitting the models, results can be visualized using following three functions;
+#' \code{\link{plot_simulated_pmp}}, \code{\link{plot_meta_model_density}}, and \code{\link{plot_predictive_mixture}}.
+#'
 #' @param ... brmsfit object
 #' @param formula_list List of brmsformula
 #' @param prior_list List of vector of prior
@@ -13,8 +21,23 @@
 #'
 #' @returns metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
 #'
+#' @example
+#' \dontrun{
+#' # brmsfit objects as arguments
+#' fit1 <- brm(y ~ (1 | g) + x, data = d)
+#' fit2 <- brm(y ~ x, data = d)
+#' fit3 <- brm(y ~ (x | g), data = d)
+#' metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=10)
+#'
+#' # Using list of formula, data and other arguments
+#' m1 <- bf(y ~ (1 | g) + x)
+#' m2 <- bf(y ~ x)
+#' m3 <- bf(y ~ (x | g))
+#'
+#' metabmc_fit <- metabmc(list(m1, m2, m3), data=d, n_sim=10)
+#' }
 #' @export
-metabmc <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=100, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-3, brms_arg_list = NULL){
+metabmc <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=20, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-3, brms_arg_list = NULL){
   brmsfit_list <- list(...)
 
   # validate argument and create brmsfit object using formula_list, prior_list, familiy_list and additional arguments

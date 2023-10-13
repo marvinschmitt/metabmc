@@ -1,4 +1,8 @@
-# sample true model and create data frame to store pmp from simulations.
+# Sample true model and create data frame to store pmp from simulations.
+# @param prior_model_prob Prior distribution from which true model is drawn
+# @param n_model number of model
+# @param n_sim number of simulation
+# @return data.frame containing row number (k), true model index and n_model columns of NA. Number of row is equal to n_sim.
 sample_true_model <- function(prior_model_prob, n_model, n_sim){
   # validation of prior_model_prob
   if (! is.character(prior_model_prob)) {
@@ -34,7 +38,13 @@ sample_true_model <- function(prior_model_prob, n_model, n_sim){
   pmp_sim
 }
 
-# when user gives list of bf formula and prior, fit model inside meta uncertainty function
+# Create brmfit object when user gives list of bf formula and prior and additional argument with brmsargs
+# @param formula_list list of brmsfit object
+# @param prior_list list of brmsprior obejct
+# @param family list of brmsfamily object
+# @param data data to fit all the model
+# @param brms_arg_list list of list containing additional argument to be passed when fitting model with brms.
+# @return list of brmsfit object
 create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL, data, brms_arg_list=NULL){
   n_model = length(formula_list)
   brmsfit_list <- list()
@@ -53,6 +63,11 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
   return(brmsfit_list)
 }
 
+# Simulate data y given prior.
+# @param brmsfit_list
+# @pmp_sim data.frame to contain simulated pmp
+# ...
+# @return n_sim by nrow(data) matrix containig simulated 'resp' given prior and predetermined variables.
 simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup){
     # simulate "formula$resp" from model given prior and pre-determined variables
     resp <- brmsfit_list[[1]]$formula$resp
@@ -74,6 +89,13 @@ simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup){
     simulated_data_matrix
 }
 
+# Obtain simulated pmp given simulated data
+# @param brmsfit_list
+# @param pmp_sim
+# @param n_model
+# @param n_sim
+# @param simulated_data_matrix Obtaind with simulate_data()
+# @return pmp_sim: the matrix with NA filled with simulated pmp. Nested pmp is added to the matrix for later use.
 post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_data_matrix){
     # Level 2: Obtain post model probability from simulated data
     resp <- brmsfit_list[[1]]$formula$resp
@@ -112,6 +134,9 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
     pmp_sim
 }
 
+# Extract meta model parameter
+# @param meta_model_posteriors obtained from get_meta_model_posteriors
+# @return data.frame containing meta model parameters
 extract_meta_model_param <- function(meta_model_posteriors){
   # only three models
   meta_model_param <- data.frame(
@@ -128,7 +153,10 @@ extract_meta_model_param <- function(meta_model_posteriors){
   }
   meta_model_param
 }
-
+# Create predictive mixture model
+# @param pmp_obs vector of observed pmps.
+# @param meta_model_param obtaind with extract_meta_model_param()
+# @return data.frame containing meta model parameters
 create_mixture_function <- function(pmp_obs, meta_model_param){
   # only three models with logistic normal.
   mixture_function <- purrr::partial(logistic_normal_mixture,
@@ -147,6 +175,10 @@ create_mixture_function <- function(pmp_obs, meta_model_param){
   return(mixture_function)
 }
 
+# Avoid simulated pmp to take zero or one to avoid error
+# @param nested_pmp last n_model row of pmp_sim
+# @param eps small number to be added / subtracted
+# @return nested_pmp with correction in zero and one
 avoid_error_by_zero_one <- function(nested_pmp, eps){
   # add small number to all data and normalize it when pmp include 0 (hence not able to fit logistic normal)
   if (any(nested_pmp == 0)){
@@ -161,15 +193,16 @@ avoid_error_by_zero_one <- function(nested_pmp, eps){
   nested_pmp
 }
 
+# Check given object is "metabmcfit"
+# @param metabmcfit object to be tested
+# @return TRUE if it is metabmcfit object FALSE otherwise
 is.metabmcfit <- function(metabmcfit){
   class(metabmcfit) == "metabmcfit"
 }
 
-#' Get prep object
-#'
-#' @inheritParams brms::posterior_predict
-#'
-#' @return prep object
+# Get prep object
+# @inheritParams brms::posterior_predict
+# @return prep object
 get_prep <- function(
     object, newdata = NULL, re_formula = NULL, re.form = NULL,
     transform = NULL, resp = NULL, negative_rt = FALSE,
@@ -188,7 +221,9 @@ get_prep <- function(
   return(prep)
 }
 
-
+# Mute message/warrings from brms and Stan
+# @param exp code to be muted
+# @return expr run muted
 suppress_mwo <- function(expr){
   suppressMessages(
     suppressWarnings(

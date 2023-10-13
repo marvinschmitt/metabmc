@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot_predictive_mixture}
 \alias{plot_predictive_mixture}
-\title{Plot simulated posterior model probability in ternary plot.}
+\title{Plot predictive mixture model}
 \usage{
 plot_predictive_mixture(metabmcfit)
 }
@@ -10,8 +10,8 @@ plot_predictive_mixture(metabmcfit)
 \item{metabmcfit}{metabmcfit object created by \code{\link{metabmc}}. Only the fit with three models is supported.}
 }
 \value{
-Ternary plot
+Single ternary plot of density of predictive mixture model along with observed PMPs.
 }
 \description{
-Plot simulated posterior model probability in ternary plot.
+Plot predictive mixture model
 }
