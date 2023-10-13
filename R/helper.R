@@ -89,7 +89,6 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
         fit_sim[[j]] <- stats::update(brmsfit_list[[j]],
                                       newdata = simulated_data,
                                       save_pars = brms::save_pars(all = TRUE),
-                                      iter = 5000,
                                       refresh = 0,
                                       silent = 2)
       })
