@@ -1,10 +1,12 @@
 Package: metabmc
-Title: What the Package Does (One Line, Title Case)
+Title: Meta-Uncertainty in Bayesian Model Compariosn
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    c(
+    person("Marvin", "Schmitt", email = "mail.marvinschmitt@gmail.com", role = c("aut", "cre")),
+    person("Paul-Christian", "Bürkner", email = "paul.buerkner@gmail.com", role = "aut"),
+    person("Yuga", "Hikida", email = "yuga.hikida@gmail.com", role = "aut"))
+Description: The metabmc is R package enables users to estimate and visualize posterior distribution 		  of model probabilities (meta models) with simulation, and predictive mixture distribution by combining simulation and posterior model probability estimated from data.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -21,5 +23,6 @@ Suggests:
     mockery,
     rmarkdown,
     testthat (>= 3.0.0)
+URL: https://meta-uncertainty.github.io
 Config/testthat/edition: 3
 VignetteBuilder: knitr
