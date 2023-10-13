@@ -14,7 +14,7 @@ metabmc(
   n_posterior_draws = 1000,
   warmup = 5000,
   prior_model_prob = "uniform",
-  eps = 1e-05,
+  eps = 0.001,
   brms_arg_list = NULL
 )
 }
