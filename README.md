@@ -6,12 +6,12 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The **metabmc** is R package provide enable user to estimate and
-visualize posterior distribution of model probabilities (meta models)
-with simulation, and predictive mixture distribution by combining
-simulation and posterior model probability obtained from observed data.
-This could enable user to correct overconfidence over specific model in
-the context of Bayesian Model Comparison.
+The **metabmc** is R package enables users to estimate and visualize
+posterior distribution of model probabilities (meta models) with
+simulation, and predictive mixture distribution by combining simulation
+and posterior model probability obtained from observed data. This could
+enable user to correct overconfidence over specific model in the context
+of Bayesian Model Comparison.
 
 ## Installation
 

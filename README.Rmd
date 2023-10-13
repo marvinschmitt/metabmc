@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The **metabmc** is R package provide enable user to estimate and visualize
+The **metabmc** is R package enables users to estimate and visualize
 posterior distribution of model probabilities (meta models) with simulation, 
 and predictive mixture distribution by combining simulation and posterior model 
 probability obtained from observed data. This could enable user to correct 
