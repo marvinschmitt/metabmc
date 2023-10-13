@@ -12,7 +12,6 @@ test_that("level_3 works", {
   pmp_sim_1[3, c("pmp1", "pmp2", "pmp3")] <- c(0.4, 0.4, 0.2)
   pmp_sim_2 <- pmp_sim_1
   pmp_sim_2$pmp <- with(pmp_sim_1, as.matrix(pmp_sim_1[, colnames(pmp_sim_1)[3:ncol(pmp_sim_1)]]))
-
   mockery::stub(level_3, "get_meta_model_posteriors", "mock_meta_model_posterior")
   mockery::stub(level_3, "extract_meta_model_param", "mock_meta_model_parameter")
   mockery::stub(level_3, "create_mixture_function", "mock_mixture_function")
