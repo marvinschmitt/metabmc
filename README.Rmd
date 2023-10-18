@@ -18,20 +18,16 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The **metabmc** is R package enables users to estimate and visualize
-posterior distribution of model probabilities (meta models) with simulation, 
-and predictive mixture distribution by combining simulation and posterior model 
-probability obtained from observed data. This could enable user to correct 
-overconfidence over specific model in the context of Bayesian Model Comparison.
-
+`metabmc` is an R package to fit and visualize the meta-uncertainty workflow, as described in the research paper by Schmitt, Radev, & Bürkner(2023). 
+By augmenting observed data with tailored simulations, we can mitigate overconfident model selection in the context of Bayesian model comparison.
 
 ## Installation
 
-You can install the development version of metabmc from [GitHub](https://github.com/) with:
+You can install the development version of `metabmc` directly from the GitHub source:
 
-``` {r, eva=FALSE}
-# install.packages("devtools")
-# devtools::install_github("marvinschmitt/metauncertainty")
+``` {r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("marvinschmitt/metabmc")
 ```
 
 ## How to use metabmc
@@ -46,15 +42,15 @@ m1 <- bf(x ~ 0 + arma(p=1, q=0))
 m2 <- bf(x ~ 0 + arma(p=0, q=1))
 m3 <- bf(x ~ 0 + arma(p=1, q=1))
 
-prior1 <- c(set_prior("normal(0, .2)", class = "ar"),
-           set_prior("normal(0, .2)", class = "sigma"))
+prior1 <- c(set_prior("normal(0, 0.2)", class = "ar"),
+           set_prior("normal(0, 0.2)", class = "sigma"))
 
-prior2 <- c(set_prior("normal(0, .2)", class = "ma"),
-           set_prior("normal(0, .2)", class = "sigma"))
+prior2 <- c(set_prior("normal(0, 0.2)", class = "ma"),
+           set_prior("normal(0, .02)", class = "sigma"))
 
-prior3 <- c(set_prior("normal(0, .2)", class = "ar"),
-           set_prior("normal(0, .2)", class = "ma"),
-           set_prior("normal(0, .2)", class = "sigma"))
+prior3 <- c(set_prior("normal(0, 0.2)", class = "ar"),
+           set_prior("normal(0, 0.2)", class = "ma"),
+           set_prior("normal(0, 0.2)", class = "sigma"))
 
 fit1 <- brm(m1, data=LakeHuron, prior = prior1, save_pars = save_pars(all = TRUE))
 fit2 <- brm(m2, data=LakeHuron, prior = prior2, save_pars = save_pars(all = TRUE))
@@ -66,35 +62,34 @@ fit3 <- brm(m3, data=LakeHuron, prior = prior3, save_pars = save_pars(all = TRUE
 library(metabmc)
 ```
 
-The brms and Stan is used as a backbone to enable user to fit complicated 
-Bayesian model with simple syntax. To estimate meta models and predictive d
-ensity, we use all-in-one function `metabmc`. We simply input `brmsfit` objects 
-along with a argument specifying the settings for simulation.
+The `metabmc` package uses brms and Stan as a backbone to fit complicated 
+Bayesian models with a straightforward interface. The entire computationally intense part of the meta-uncertainty workflow is encapsulated in the function `metabmc`. We can simply input configured `brmsfit` objects along with a arguments that specify the simulation settings.
 
 ```{r, results='hide', eval=FALSE}
 metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
 ```
 
-Posterior model probabilities obtained from simulation can be visualized as 
-follow.
+### Visualizations
+
+Posterior model probabilities obtained from simulation can be visualized with the `plot_simulated_pmp()` function:
 
 ```{r,eval=FALSE}
 plot_simulated_pmp(metabmc_fit)
 ```
 
-Visualization of estimated meta models can be obtained as follow.
+The posterior predictive distributions of each estimated meta model can be visualized via the `plot_meta_model_density()` function:
 
 ```{r,eval=FALSE}
 plot_meta_model_density(metabmc_fit)
 ```
 
-The visualization of estimated predictive mixture model with observed posterior
-model probabilities can be obtained as follow.
+The visualization of estimated predictive mixture based on observed posterior
+model probabilities is implemented in the `plot_predictive_mixture()` function.
 
 ```{r,eval=FALSE}
 plot_predictive_mixture(metabmc_fit)
 ```
 
-
+This is usually the endpoint of a meta-uncertainty analysis, as described in the original research paper.
 
 
