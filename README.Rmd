@@ -33,11 +33,14 @@ devtools::install_github("marvinschmitt/metabmc")
 ## How to use metabmc
 
 ```{r include=FALSE}
-# library(ggplot2)
-# library(brms)
+library(ggplot2)
+library(brms)
 ```
 
-```{r, results='hide', include=FALSE, eval=FALSE}
+```{r, results='hide', include=FALSE}
+data("LakeHuron")
+LakeHuron <- LakeHuron - mean(LakeHuron)
+
 m1 <- bf(x ~ 0 + arma(p=1, q=0))
 m2 <- bf(x ~ 0 + arma(p=0, q=1))
 m3 <- bf(x ~ 0 + arma(p=1, q=1))
@@ -46,7 +49,7 @@ prior1 <- c(set_prior("normal(0, 0.2)", class = "ar"),
            set_prior("normal(0, 0.2)", class = "sigma"))
 
 prior2 <- c(set_prior("normal(0, 0.2)", class = "ma"),
-           set_prior("normal(0, .02)", class = "sigma"))
+           set_prior("normal(0, 0.2)", class = "sigma"))
 
 prior3 <- c(set_prior("normal(0, 0.2)", class = "ar"),
            set_prior("normal(0, 0.2)", class = "ma"),
@@ -65,7 +68,7 @@ library(metabmc)
 The `metabmc` package uses brms and Stan as a backbone to fit complicated 
 Bayesian models with a straightforward interface. The entire computationally intense part of the meta-uncertainty workflow is encapsulated in the function `metabmc`. We can simply input configured `brmsfit` objects along with a arguments that specify the simulation settings.
 
-```{r, results='hide', eval=FALSE}
+```{r, results='hide'}
 metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
 ```
 
@@ -73,20 +76,20 @@ metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
 
 Posterior model probabilities obtained from simulation can be visualized with the `plot_simulated_pmp()` function:
 
-```{r,eval=FALSE}
+```{r}
 plot_simulated_pmp(metabmc_fit)
 ```
 
 The posterior predictive distributions of each estimated meta model can be visualized via the `plot_meta_model_density()` function:
 
-```{r,eval=FALSE}
+```{r}
 plot_meta_model_density(metabmc_fit)
 ```
 
 The visualization of estimated predictive mixture based on observed posterior
 model probabilities is implemented in the `plot_predictive_mixture()` function.
 
-```{r,eval=FALSE}
+```{r}
 plot_predictive_mixture(metabmc_fit)
 ```
 
