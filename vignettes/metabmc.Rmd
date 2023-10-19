@@ -57,7 +57,7 @@ $J$ candidate models. However, they also have uncertainty themselves due to (i) 
 generating process of $y$; and (ii) finite samples to fit each model. 
 One widely acknowledged problem in Bayesian model comparison is that PMPs obtained from data $y$ could be overconfident / underconfident.
 
-With `metabmc`, we can obtain distribution of PMPs using simulated 
+With **metabmc**, we can obtain distribution of PMPs using simulated 
 data $\overset{s}{y}$ given true model $M*$ and prior distribution $p(\theta)$. 
 We currently support all the framework for three candidate models.
 
@@ -155,14 +155,14 @@ plot_meta_model_density(metabmc_fit)
 The area with high density is displayed in yellow while low density is displayed 
 in purple.
 
-## Predictive mixture model using `metabmc`
+## Predictive mixture model using **metabmc**
 
 Combining meta models and posterior model probabilities obtained from observed
 data $\mathbf{\overset{o}{\pi}} := (\overset{o}{\pi_1}, \overset{o}{\pi_2}, \overset{o}{\pi_3})$, 
 we can construct a predictive mixture distribution of posterior model probabilities 
 by taking weighted sum of meta model by observed posterior model probabilities:
 
-$f(\tilde{\pi}):=\sum_{j=1}^{3} \pi^o_j \ p(\pi \mid \{\pi^s\}_j)$
+$f(\tilde{\pi}):=\sum_{j=1}^{3} \overset{o}{\pi}_j \ p(\pi \mid \{\overset{s}{\pi}\}_j)$
 
 The visualization of estimated predictive mixture model can be obtained as follows:
 
