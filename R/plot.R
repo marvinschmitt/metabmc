@@ -1,7 +1,7 @@
 #' Plot simulated posterior model probability.
 #' @param metabmcfit metabmcfit object created by \code{\link{metabmc}}. Only the fit with three models is supported.
 #' @returns Three triangle plot showing simulated posterior model probability from three true models.
-#' @example \dontrun{
+#' @examples \dontrun{
 #' plot_simulated_pmp(metabmc_fit)
 #' }
 #' @export
@@ -29,10 +29,10 @@ plot_simulated_pmp <- function(metabmcfit){
 #' Plot density of metamodels
 #' @param metabmcfit metabmcfit object created by \code{\link{metabmc}}.  Only the fit with three models is supported.
 #' @returns Three triangle plot of density of meta models (Distribution of posterior model probability)
-#' @example \dontrun{
+#' @examples \dontrun{
 #' plot_meta_model_density(metabmc_fit)
 #' }
-#' @exports
+#' @export
 plot_meta_model_density <- function(metabmcfit){
   stopifnot(is.metabmcfit(metabmcfit))
   pmp_sim <- metabmcfit$pmp_sim
@@ -67,9 +67,13 @@ plot_meta_model_density <- function(metabmcfit){
     ggplot2::facet_grid(cols=vars(true_model), labeller = label_parsed) +
     ggplot2::theme(strip.text = element_text(size = 18))
 }
+
 #' Plot predictive mixture model
 #' @param metabmcfit metabmcfit object created by \code{\link{metabmc}}. Only the fit with three models is supported.
 #' @returns Single ternary plot of density of predictive mixture model along with observed PMPs.
+#' @examples \dontrun{
+#' plot_predictive_mixture(metabmc_fit)
+#' }
 #' @export
 plot_predictive_mixture <- function(metabmcfit){
   stopifnot(is.metabmcfit(metabmcfit))

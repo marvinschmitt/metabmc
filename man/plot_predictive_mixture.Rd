@@ -15,3 +15,8 @@ Single ternary plot of density of predictive mixture model along with observed P
 \description{
 Plot predictive mixture model
 }
+\examples{
+\dontrun{
+plot_predictive_mixture(metabmc_fit)
+}
+}

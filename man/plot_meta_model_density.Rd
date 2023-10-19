@@ -15,3 +15,8 @@ Three triangle plot of density of meta models (Distribution of posterior model p
 \description{
 Plot density of metamodels
 }
+\examples{
+\dontrun{
+plot_meta_model_density(metabmc_fit)
+}
+}

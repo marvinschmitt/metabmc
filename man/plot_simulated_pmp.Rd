@@ -15,3 +15,8 @@ Three triangle plot showing simulated posterior model probability from three tru
 \description{
 Plot simulated posterior model probability.
 }
+\examples{
+\dontrun{
+plot_simulated_pmp(metabmc_fit)
+}
+}
