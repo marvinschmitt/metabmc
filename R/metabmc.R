@@ -21,7 +21,7 @@
 #'
 #' @returns metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
 #'
-#' @example
+#' @examples
 #' \dontrun{
 #' # brmsfit objects as arguments
 #' fit1 <- brm(y ~ (1 | g) + x, data = d)

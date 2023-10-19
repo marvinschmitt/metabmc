@@ -52,3 +52,19 @@ and observed posterior model probabilities. Currently only three model candidate
 After fitting the models, results can be visualized using following three functions;
 \code{\link{plot_simulated_pmp}}, \code{\link{plot_meta_model_density}}, and \code{\link{plot_predictive_mixture}}.
 }
+\examples{
+\dontrun{
+# brmsfit objects as arguments
+fit1 <- brm(y ~ (1 | g) + x, data = d)
+fit2 <- brm(y ~ x, data = d)
+fit3 <- brm(y ~ (x | g), data = d)
+metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=10)
+
+# Using list of formula, data and other arguments
+m1 <- bf(y ~ (1 | g) + x)
+m2 <- bf(y ~ x)
+m3 <- bf(y ~ (x | g))
+
+metabmc_fit <- metabmc(list(m1, m2, m3), data=d, n_sim=10)
+}
+}
