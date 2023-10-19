@@ -1,12 +1,14 @@
 ---
 title: "Estimating and visualizing meta-uncertainty with metabmc"
-author: "Yuga Hikida"
+author: 
+- "Marvin Schmitt"
+- "Yuga Hikida"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{Estimating and visualizing posterior distribution of model probability with metabmc}
+  %\VignetteIndexEntry{Estimating and visualizing meta-uncertainty with metabmc}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 params:
@@ -56,7 +58,7 @@ generating process of $y$; and (ii) finite samples to fit each model.
 One widely acknowledged problem in Bayesian model comparison is that PMPs obtained from data $y$ could be overconfident / underconfident.
 
 With `metabmc`, we can obtain distribution of PMPs using simulated 
-data $y^{s}$ given true model $M*$ and prior distribution $p(\theta)$. 
+data $\overset{s}{y}$ given true model $M*$ and prior distribution $p(\theta)$. 
 We currently support all the framework for three candidate models.
 
 ## Posterior distribution of model probability using **metabmc**
@@ -78,15 +80,15 @@ m1 <- bf(x ~ 0 + arma(p=1, q=0))
 m2 <- bf(x ~ 0 + arma(p=0, q=1))
 m3 <- bf(x ~ 0 + arma(p=1, q=1))
 
-prior1 <- c(set_prior("normal(0, .2)", class = "ar"),
+prior1 <- c(set_prior("normal(0, 0.2)", class = "ar"),
+           set_prior("normal(0, 0.2)", class = "sigma"))
+
+prior2 <- c(set_prior("normal(0, 0.2)", class = "ma"),
            set_prior("normal(0, .2)", class = "sigma"))
 
-prior2 <- c(set_prior("normal(0, .2)", class = "ma"),
-           set_prior("normal(0, .2)", class = "sigma"))
-
-prior3 <- c(set_prior("normal(0, .2)", class = "ar"),
-           set_prior("normal(0, .2)", class = "ma"),
-           set_prior("normal(0, .2)", class = "sigma"))
+prior3 <- c(set_prior("normal(0, 0.2)", class = "ar"),
+           set_prior("normal(0, 0.2)", class = "ma"),
+           set_prior("normal(0, 0.2)", class = "sigma"))
 
 fit1 <- brm(m1, data=LakeHuron, prior = prior1, save_pars = save_pars(all = TRUE))
 fit2 <- brm(m2, data=LakeHuron, prior = prior2, save_pars = save_pars(all = TRUE))
@@ -104,7 +106,7 @@ metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
 
 Alternatively, you can also specify your models as a list of prior distributions and brms formulas. In this case, all models are compiled and fit inside the `metabmc` function.
 
-```{r eval=FALSE}
+```{r, eval=FALSE}
 metabmc_fit <- metabmc(list(m1, m2, m3), list(prior1, prior2, prior3), data = LakeHuron, n_sim=20)
 ```
 
@@ -112,20 +114,20 @@ Firstly, we sample a "true model index" $M^*$ from our $J = 3$ candidates, accor
 It is set to be uniform distribution by default indicating all models have equal
 probability of being sampled. If you have some prior belief about the models, here's your chance to encode that.
 
-Given the "true model" $M^*$, we can readily simulate synthetic data $y^{s}$ because Bayesian models are generative by definition:
+Given the "true model" $M^*$, we can readily simulate synthetic data $\overset{s}{y}$ because Bayesian models are generative by definition:
 
 $$
 \begin{aligned}
 M^* &\sim p(M) \\
-\theta^s & \sim p(\theta\mid M^*)\\
-y^s & \sim p(y\mid \theta^s, M^*)
+\overset{s}{\theta} & \sim p(\theta\mid M^*)\\
+\overset{s}{y} & \sim p(y\mid \overset{s}{\theta}, M^*)
 \end{aligned}
 $$
 
-For this simulated data set $y^s$, we fit each model $M_1, \ldots, M_J$ to obtain a posterior $p(\theta\mid y^s, M_j)$ and ultimately compute the posterior model probabilities $p(M_1\mid y^s), p(M_2\mid y^s), p(M_3\mid y^s)$. In accordance with the notation from the Meta-Uncertainty paper, we abbreviate this as:
+For this simulated data set $\overset{s}{y}$, we fit each model $M_1, \ldots, M_J$ to obtain a posterior $p(\theta\mid \overset{s}{y}, M_j)$ and ultimately compute the posterior model probabilities $p(M_1\mid \overset{s}{y}), p(M_2\mid \overset{s}{y}), p(M_3\mid \overset{s}{y})$. In accordance with the notation from the Meta-Uncertainty paper, we abbreviate this as:
 
 $$\mathbf{\overset{s}{\pi}} := (p(M_1 \mid \overset{s}{y}),\ p(M_2 \mid \overset{s}{y}),\ p(M_3 \mid \overset{s}{y}))$$
-We can repeat this process (sample true model $M^*$, sample parameters $\theta^s$, simulate data $y^s$, compute PMPs $\overset{s}{\pi}$) multiple times to get a whole sampling distribution of posterior model probabilities. 
+We can repeat this process (sample true model $M^*$, sample parameters $\theta^s$, simulate data $\overset{s}{y}$, compute PMPs $\overset{s}{\pi}$) multiple times to get a whole sampling distribution of posterior model probabilities. 
 The number of simulated data sets and computed PMPs is controlled with the `n_sim` argument, and we choose `n_sim=20` here.
 
 Visualizations make things clearer, so here we go:
