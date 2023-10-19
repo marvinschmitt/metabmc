@@ -46,7 +46,6 @@ with the `plot_simulated_pmp()` function:
 
 ``` r
 plot_simulated_pmp(metabmc_fit)
-#> You are using an untested initial demo of {ggsimplex} beware of unexpected behavior and bugs.
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
@@ -66,8 +65,6 @@ posterior model probabilities is implemented in the
 
 ``` r
 plot_predictive_mixture(metabmc_fit)
-#> Warning in is.na(x): is.na() applied to non-(list or vector) of type
-#> 'expression'
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
