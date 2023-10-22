@@ -104,7 +104,8 @@ plot_predictive_mixture <- function(metabmcfit){
       geom = "curve", x = 0.1, y = 0.5, xend = pmp_obs_cartesian[1]-0.02, yend = pmp_obs_cartesian[2]+0.02,
       curvature = .3, arrow = ggplot2::arrow(length = unit(2, "mm"))
     ) +
-    ggplot2::annotate(geom = "text", x = 0.1, y = 0.51, label = latex2exp::TeX(r'($\mathring{\pi})'), hjust = "center", vjust="bottom", size=10) +
+    ggplot2::annotate(geom = "text", x = 0.1, y = 0.51, label = latex2exp::TeX(r"($\mathring{\pi}$)", output = "character"), hjust = "center", vjust="bottom", size=10, parse = TRUE
+) +
     ggsimplex::geom_simplex_canvas(fontsize=20)
 }
 
