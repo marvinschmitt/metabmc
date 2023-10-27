@@ -18,6 +18,6 @@ test_that("level_3 works", {
 
   expected_out <- list(pmp_sim = pmp_sim_2, simulated_data_matrix = NULL, meta_model_param = "mock_meta_model_parameter", pmp_obs = pmp_pbs, mixture_function = "mock_mixture_function")
   class(expected_out) <- "metabmcfit"
-  out <- level_3(pmp_pbs, pmp_sim_1)
+  out <- level_3(pmp_pbs, pmp_sim_1, verbosity=0)
   expect_equal(out, expected_out)
 })

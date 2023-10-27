@@ -45,9 +45,10 @@ sample_true_model <- function(prior_model_prob, n_model, n_sim){
 # @param data data to fit all the model
 # @param brms_arg_list list of list containing additional argument to be passed when fitting model with brms.
 # @return list of brmsfit object
-create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL, data, brms_arg_list=NULL){
+create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL, data, brms_arg_list=NULL, verbosity){
   n_model = length(formula_list)
   brmsfit_list <- list()
+  supress_all({
   pb <- utils::txtProgressBar(min = 0, max = n_model, style = 3, width = 50, char = "=")
   for (j in 1:n_model){
     brms::validate_prior(prior_list[[j]], formula_list[[j]], data, family_list[[j]])
@@ -60,6 +61,7 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
     utils::setTxtProgressBar(pb, j)
   }
   close(pb)
+  }, verbosity)
   return(brmsfit_list)
 }
 
@@ -68,12 +70,12 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
 # @pmp_sim data.frame to contain simulated pmp
 # ...
 # @return n_sim by nrow(data) matrix containig simulated 'resp' given prior and predetermined variables.
-simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup){
+simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup, suppressor){
     # simulate "formula$resp" from model given prior and pre-determined variables
     resp <- brmsfit_list[[1]]$formula$resp
     dat <- brmsfit_list[[1]]$data
     simulated_data_matrix <- matrix(data = NA, nrow = n_sim, ncol = nrow(dat))
-    suppress_mwo(
+    suppressor(
     for (j in 1:n_model){
       n_sim_model_j <- unname(table(pmp_sim$true_model_idx)[j])
       prior_predictive_fit <- stats::update(brmsfit_list[[j]],
@@ -96,8 +98,9 @@ simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup){
 # @param n_sim
 # @param simulated_data_matrix Obtaind with simulate_data()
 # @return pmp_sim: the matrix with NA filled with simulated pmp. Nested pmp is added to the matrix for later use.
-post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_data_matrix){
+post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_data_matrix, suppressor, verbosity){
     # Level 2: Obtain post model probability from simulated data
+  supress_all({
     resp <- brmsfit_list[[1]]$formula$resp
     simulated_data <- brmsfit_list[[1]]$data
     pb <- utils::txtProgressBar(min = 0, max = n_sim, style = 3, width = 50, char = "=")
@@ -106,7 +109,7 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
       ## combine simulated data and predetermined data
       simulated_data[, resp] <- simulated_data_matrix[k, ]
       fit_sim <- list()
-      suppress_mwo(
+      suppressor(
       for (j in 1:n_model){
         fit_sim[[j]] <- stats::update(brmsfit_list[[j]],
                                       newdata = simulated_data,
@@ -114,7 +117,7 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
                                       refresh = 0,
                                       silent = 2)
       })
-      suppress_mwo(
+      suppressor(
       pmp <- brms::do_call(brms::post_prob, fit_sim)
       )
 
@@ -131,6 +134,9 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
     close(pb)
     ## create nested pmp for "meta_model_posteriors"
     pmp_sim$pmp <- with(pmp_sim, as.matrix(pmp_sim[, colnames(pmp_sim)[3:ncol(pmp_sim)]]))
+
+  }, verbosity)
+
     pmp_sim
 }
 
@@ -230,6 +236,16 @@ suppress_mwo <- function(expr){
       invisible(capture.output(expr, type = "output"))
     )
   )
+}
+
+# Wrapper for suppress_mwo when verbosity = 0
+supress_all <- function(exp, verbosity){
+  if (verbosity == 0){
+    suppress_mwo(exp)
+  }
+  else {
+    exp
+  }
 }
 
 

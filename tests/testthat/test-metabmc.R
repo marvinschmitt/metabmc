@@ -31,7 +31,7 @@ test_that("Fit works given pre-fitted brms object", {
   mockery::stub(metabmc, "create_mixture_function", "mock_mixture_function")
   expected_out <- list(pmp_sim = pmp_sim_2, simulated_data_matrix = simulated_data_matrix, meta_model_param = "mock_meta_model_parameter", pmp_obs = c(0.2, 0.2, 0.6), mixture_function = "mock_mixture_function")
   class(expected_out) <- "metabmcfit"
-  expect_equal(metabmc(f1, f2, f2), expected_out)
+  expect_equal(metabmc(f1, f2, f2, verbosity=0), expected_out)
 })
 
 test_that("Fit works given formula, family, data, et cetra", {
@@ -63,6 +63,7 @@ test_that("Fit works given formula, family, data, et cetra", {
   mockery::stub(metabmc, "create_mixture_function", "mock_mixture_function")
   expected_out <- list(pmp_sim = pmp_sim_2, simulated_data_matrix = simulated_data_matrix, meta_model_param = "mock_meta_model_parameter", pmp_obs = c(0.2, 0.2, 0.6), mixture_function = "mock_mixture_function")
   class(expected_out) <- "metabmcfit"
-  out <- metabmc(formula_list = list(f1, f2, f2), prior_list = list(prior, prior, prior), family_list = list(fam1, fam2, fam2), data=dat, brms_arg_list = list(list(backend = "mock", mock_fit = "1", rename = FALSE), list(backend = "mock", mock_fit = "2", rename = FALSE), list(backend = "mock", mock_fit = "3", rename = FALSE)))
+  out <- metabmc(formula_list = list(f1, f2, f2), prior_list = list(prior, prior, prior), family_list = list(fam1, fam2, fam2), data=dat, verbosity=0, brms_arg_list = list(list(backend = "mock", mock_fit = "1", rename = FALSE), list(backend = "mock", mock_fit = "2", rename = FALSE), list(backend = "mock", mock_fit = "3", rename = FALSE)))
   expect_equal(out, expected_out)
 })
+

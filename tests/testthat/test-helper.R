@@ -35,7 +35,7 @@ test_that("brms object is made given formula, prior, et cetera", {
   expected_out <- list(brmsfit_1, brmsfit_2)
   attr(expected_out[[1]]$data, 'data_name') <- ".x6" # not crucial so force the test to pass
   attr(expected_out[[2]]$data, 'data_name') <- ".x6"
-  out <- create_brmsfit_list(formula_list = list(f1, f2), prior_list = list(prior, prior, prior), family_list = list(fam1, fam2), data = dat, brms_arg_list = list(list(backend="mock", mock_fit = "1", rename = FALSE), list(backend="mock", mock_fit = "2", rename = FALSE)))
+  out <- create_brmsfit_list(formula_list = list(f1, f2), prior_list = list(prior, prior, prior), family_list = list(fam1, fam2), data = dat, brms_arg_list = list(list(backend="mock", mock_fit = "1", rename = FALSE), list(backend="mock", mock_fit = "2", rename = FALSE)), verbosity=0)
   expect_equal(out, expected_out)
 })
 
@@ -73,7 +73,7 @@ test_that("simulate_data works", {
   mockery::stub(simulate_data, "stats::update", 1)
   mockery::stub(simulate_data, "brms::posterior_predict", m)
   expected_out <- matrix(c(rep(1,10), rep(2,10), rep(3,10)), ncol=10, byrow=TRUE)
-  expect_equal(simulate_data(brmsfit_list, pmp_sim, 3, n_sim, 0), expected_out)
+  expect_equal(simulate_data(brmsfit_list, pmp_sim, 3, n_sim, 0, suppress_mwo), expected_out)
 })
 
 test_that("post_prob_from_sim works", {
@@ -105,7 +105,7 @@ test_that("post_prob_from_sim works", {
   pmp_sim_2[2, c("pmp1", "pmp2", "pmp3")] <- c(0.3, 0.2, 0.5)
   pmp_sim_2[3, c("pmp1", "pmp2", "pmp3")] <- c(0.4, 0.4, 0.2)
   pmp_sim_2$pmp <- with(pmp_sim_2, as.matrix(pmp_sim_2[, colnames(pmp_sim_2)[3:ncol(pmp_sim_2)]]))
-  expect_equal(post_prob_from_sim(brmsfit_list, pmp_sim_1, 3, n_sim, simulate_data_matrix), pmp_sim_2)
+  expect_equal(post_prob_from_sim(brmsfit_list, pmp_sim_1, 3, n_sim, simulate_data_matrix, suppress_mwo, verbosity=0), pmp_sim_2)
 })
 
 # test_that("extract_meta_model_param works", {
