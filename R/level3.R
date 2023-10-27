@@ -6,7 +6,7 @@
 #' @param eps small number to be added / subtracted when posterior model probability takes 0 / 1
 #' @return meta_uncertainty object
 #' @export
-level_3 <- function(pmp_obs=c(...), pmp_sim=NULL, n_posterior_draws=1000, eps=1e-10, verbosity=1){
+level_3 <- function(pmp_obs=c(...), pmp_sim=NULL, n_posterior_draws=1000, eps=1e-3, verbosity=1){
   # setting of verbosity
   if (verbosity != 2){
     suppressor <- suppress_mwo

@@ -5,11 +5,12 @@
 #'
 #' @return List of posterior draws for each model
 #' @export
-get_meta_model_posteriors <- function(data, n_posterior_draws, suppressor) {
+get_meta_model_posteriors <- function(data=NULL, n_posterior_draws=100, suppressor=suppress_mwo) {
+
   pb <- utils::txtProgressBar(min = 0, max = 3, style = 3, width = 50, char = "=")
   meta_model_fit_list <- list()
   for (j in 1:3){
-    suppressor(
+    suppressor({
     meta_model_fit_list[[j]] <- brms::brm(
       pmp ~ 1,
       data = dplyr::filter(data, true_model_idx == j),
@@ -19,9 +20,8 @@ get_meta_model_posteriors <- function(data, n_posterior_draws, suppressor) {
       cores = 2,
       iter = 1000 + n_posterior_draws,
       warmup = 1000,
-      refresh = 0,
-      silent = 2)
-    )
+      refresh = 0)
+    })
     utils::setTxtProgressBar(pb, j)
   }
 

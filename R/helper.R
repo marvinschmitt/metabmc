@@ -56,7 +56,6 @@ create_brmsfit_list <- function(formula_list=list(), prior_list=NULL, family_lis
     brms_arg_list[[j]]$prior <- prior_list[[j]]
     brms_arg_list[[j]]$data <- data
     brms_arg_list[[j]]$family <- family_list[[j]]
-    brms_arg_list[[j]]$silent <- 2
     brmsfit_list[[j]] <- brms::do_call(brms::brm, brms_arg_list[[j]])
     utils::setTxtProgressBar(pb, j)
   }
@@ -83,8 +82,7 @@ simulate_data <- function(brmsfit_list=list(), pmp_sim=NULL, n_model=3, n_sim=3,
                                             sample_prior = "only",
                                             iter = warmup + n_sim_model_j,
                                             warmup = warmup,
-                                            refresh = 0,
-                                            silent = 2)
+                                            refresh = 0)
       simulated_quantities <- brms::posterior_predict(prior_predictive_fit, ndraws = n_sim_model_j, refresh=0, silent=2)
       simulated_data_matrix[which(pmp_sim$true_model_idx == j), ] <- simulated_quantities
     })
@@ -114,8 +112,7 @@ post_prob_from_sim <- function(brmsfit_list=list(), pmp_sim=NULL, n_model=3, n_s
         fit_sim[[j]] <- stats::update(brmsfit_list[[j]],
                                       newdata = simulated_data,
                                       save_pars = brms::save_pars(all = TRUE),
-                                      refresh = 0,
-                                      silent = 2)
+                                      refresh = 0)
       })
       suppressor(
       pmp <- brms::do_call(brms::post_prob, fit_sim)

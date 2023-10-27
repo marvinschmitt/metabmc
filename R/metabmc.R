@@ -18,7 +18,8 @@
 #' @param prior_model_prob Prior distribution from which true model is drawn
 #' @param eps Small number to be added / subtracted when posterior model probability takes 0 / 1
 #' @param brms_arg_list Additional argument to be passed to brms::brm when fitting model
-#'
+#' @param verbosity Verbosity level between 0 and 2. If 0, all the output is hidden. If 1 (default), only progress bar is
+#' shown. If 2, all the output is shown.
 #' @returns metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
 #'
 #' @examples
@@ -68,7 +69,7 @@ metabmc <- function(..., formula_list=list(...), prior_list=list(...), family_li
   ## if pmp include zero or 1, adjust values
   pmp_sim$pmp <- avoid_error_by_zero_one(pmp_sim$pmp, eps)
   cat("Step 3 / 4: Fitting meta model.\n")
-  meta_model_posteriors <- get_meta_model_posteriors(pmp_sim, n_posterior_draws, suppressor, verbosity)
+  meta_model_posteriors <- get_meta_model_posteriors(pmp_sim, n_posterior_draws, suppressor)
   meta_model_param <- extract_meta_model_param(meta_model_posteriors)
 
   # Predictive mixture
