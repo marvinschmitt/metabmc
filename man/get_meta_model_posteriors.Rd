@@ -4,7 +4,7 @@
 \alias{get_meta_model_posteriors}
 \title{Fit meta models and return posterior draws}
 \usage{
-get_meta_model_posteriors(data, n_posterior_draws)
+get_meta_model_posteriors(data, n_posterior_draws, suppressor)
 }
 \arguments{
 \item{data}{simulated data}

@@ -15,7 +15,8 @@ metabmc(
   warmup = 5000,
   prior_model_prob = "uniform",
   eps = 0.001,
-  brms_arg_list = NULL
+  brms_arg_list = NULL,
+  verbosity = 1
 )
 }
 \arguments{
