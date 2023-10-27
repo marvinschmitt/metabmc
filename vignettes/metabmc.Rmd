@@ -1,8 +1,6 @@
 ---
 title: "Estimating and visualizing meta-uncertainty with metabmc"
-author: 
-- "Marvin Schmitt"
-- "Yuga Hikida"
+author: "Yuga Hikida"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
