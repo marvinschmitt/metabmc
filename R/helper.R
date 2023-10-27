@@ -3,7 +3,7 @@
 # @param n_model number of model
 # @param n_sim number of simulation
 # @return data.frame containing row number (k), true model index and n_model columns of NA. Number of row is equal to n_sim.
-sample_true_model <- function(prior_model_prob, n_model, n_sim){
+sample_true_model <- function(prior_model_prob=c(...), n_model=3, n_sim=3){
   # validation of prior_model_prob
   if (! is.character(prior_model_prob)) {
     if (length(prior_model_prob) != n_model | !all(prior_model_prob < 1)
@@ -45,7 +45,7 @@ sample_true_model <- function(prior_model_prob, n_model, n_sim){
 # @param data data to fit all the model
 # @param brms_arg_list list of list containing additional argument to be passed when fitting model with brms.
 # @return list of brmsfit object
-create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL, data, brms_arg_list=NULL, verbosity){
+create_brmsfit_list <- function(formula_list=list(), prior_list=NULL, family_list=NULL, data=NULL, brms_arg_list=NULL, verbosity=1){
   n_model = length(formula_list)
   brmsfit_list <- list()
   supress_all({
@@ -70,7 +70,7 @@ create_brmsfit_list <- function(formula_list, prior_list=NULL, family_list=NULL,
 # @pmp_sim data.frame to contain simulated pmp
 # ...
 # @return n_sim by nrow(data) matrix containig simulated 'resp' given prior and predetermined variables.
-simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup, suppressor){
+simulate_data <- function(brmsfit_list=list(), pmp_sim=NULL, n_model=3, n_sim=3, warmup=5000, suppressor=suppress_mwo){
     # simulate "formula$resp" from model given prior and pre-determined variables
     resp <- brmsfit_list[[1]]$formula$resp
     dat <- brmsfit_list[[1]]$data
@@ -98,7 +98,7 @@ simulate_data <- function(brmsfit_list, pmp_sim, n_model, n_sim, warmup, suppres
 # @param n_sim
 # @param simulated_data_matrix Obtaind with simulate_data()
 # @return pmp_sim: the matrix with NA filled with simulated pmp. Nested pmp is added to the matrix for later use.
-post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_data_matrix, suppressor, verbosity){
+post_prob_from_sim <- function(brmsfit_list=list(), pmp_sim=NULL, n_model=3, n_sim=3, simulated_data_matrix=NULL, suppressor=suppress_mwo, verbosity=1){
     # Level 2: Obtain post model probability from simulated data
   supress_all({
     resp <- brmsfit_list[[1]]$formula$resp
@@ -143,7 +143,7 @@ post_prob_from_sim <- function(brmsfit_list, pmp_sim, n_model, n_sim, simulated_
 # Extract meta model parameter
 # @param meta_model_posteriors obtained from get_meta_model_posteriors
 # @return data.frame containing meta model parameters
-extract_meta_model_param <- function(meta_model_posteriors){
+extract_meta_model_param <- function(meta_model_posteriors=NULL){
   # only three models
   meta_model_param <- data.frame(
     true_model_idx = 1:3
@@ -163,7 +163,7 @@ extract_meta_model_param <- function(meta_model_posteriors){
 # @param pmp_obs vector of observed pmps.
 # @param meta_model_param obtaind with extract_meta_model_param()
 # @return data.frame containing meta model parameters
-create_mixture_function <- function(pmp_obs, meta_model_param){
+create_mixture_function <- function(pmp_obs=c(...), meta_model_param=NULL){
   # only three models with logistic normal.
   mixture_function <- purrr::partial(logistic_normal_mixture,
                                      theta = pmp_obs,
@@ -185,7 +185,7 @@ create_mixture_function <- function(pmp_obs, meta_model_param){
 # @param nested_pmp last n_model row of pmp_sim
 # @param eps small number to be added / subtracted
 # @return nested_pmp with correction in zero and one
-avoid_error_by_zero_one <- function(nested_pmp, eps){
+avoid_error_by_zero_one <- function(nested_pmp=NULL, eps=1e-3){
   # add small number to all data and normalize it when pmp include 0 (hence not able to fit logistic normal)
   if (any(nested_pmp == 0)){
     nested_pmp <- nested_pmp + eps
@@ -230,7 +230,7 @@ get_prep <- function(
 # Mute message/warrings from brms and Stan
 # @param exp code to be muted
 # @return expr run muted
-suppress_mwo <- function(expr){
+suppress_mwo <- function(expr=NULL){
   suppressMessages(
     suppressWarnings(
       invisible(capture.output(expr, type = "output"))
@@ -239,7 +239,7 @@ suppress_mwo <- function(expr){
 }
 
 # Wrapper for suppress_mwo when verbosity = 0
-supress_all <- function(exp, verbosity){
+supress_all <- function(exp=NULL, verbosity=1){
   if (verbosity == 0){
     suppress_mwo(exp)
   }

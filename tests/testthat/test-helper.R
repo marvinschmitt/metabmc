@@ -35,7 +35,7 @@ test_that("brms object is made given formula, prior, et cetera", {
   expected_out <- list(brmsfit_1, brmsfit_2)
   attr(expected_out[[1]]$data, 'data_name') <- ".x6" # not crucial so force the test to pass
   attr(expected_out[[2]]$data, 'data_name') <- ".x6"
-  out <- create_brmsfit_list(formula_list = list(f1, f2), prior_list = list(prior, prior, prior), family_list = list(fam1, fam2), data = dat, brms_arg_list = list(list(backend="mock", mock_fit = "1", rename = FALSE), list(backend="mock", mock_fit = "2", rename = FALSE)), verbosity=0)
+  out <- create_brmsfit_list(formula_list = list(f1, f2), prior_list = list(prior, prior), family_list = list(fam1, fam2), data = dat, brms_arg_list = list(list(backend="mock", mock_fit = "1", rename = FALSE), list(backend="mock", mock_fit = "2", rename = FALSE)), verbosity=0)
   expect_equal(out, expected_out)
 })
 
@@ -107,7 +107,3 @@ test_that("post_prob_from_sim works", {
   pmp_sim_2$pmp <- with(pmp_sim_2, as.matrix(pmp_sim_2[, colnames(pmp_sim_2)[3:ncol(pmp_sim_2)]]))
   expect_equal(post_prob_from_sim(brmsfit_list, pmp_sim_1, 3, n_sim, simulate_data_matrix, suppress_mwo, verbosity=0), pmp_sim_2)
 })
-
-# test_that("extract_meta_model_param works", {
-# })
-

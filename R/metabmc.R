@@ -37,7 +37,7 @@
 #' metabmc_fit <- metabmc(list(m1, m2, m3), data=d, n_sim=10)
 #' }
 #' @export
-metabmc <- function(..., formula_list, prior_list, family_list = rep(NULL, 3), data = NULL, n_sim=20, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-3, brms_arg_list = NULL, verbosity=1){
+metabmc <- function(..., formula_list=list(...), prior_list=list(...), family_list = rep(NULL, 3), data = NULL, n_sim=20, n_posterior_draws=1000, warmup = 5000, prior_model_prob="uniform", eps = 1e-3, brms_arg_list = list(...), verbosity=1){
   brmsfit_list <- list(...)
 
   # setting of verbosity
