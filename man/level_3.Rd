@@ -4,7 +4,13 @@
 \alias{level_3}
 \title{Obtain meta_uncertainty_fit object given observed and simulated posterior model probability.}
 \usage{
-level_3(pmp_obs, pmp_sim, n_posterior_draws = 1000, eps = 1e-10, verbosity = 1)
+level_3(
+  pmp_obs = c(...),
+  pmp_sim = NULL,
+  n_posterior_draws = 1000,
+  eps = 0.001,
+  verbosity = 1
+)
 }
 \arguments{
 \item{pmp_obs}{vector of observed model probability.}

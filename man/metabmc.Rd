@@ -6,8 +6,8 @@
 \usage{
 metabmc(
   ...,
-  formula_list,
-  prior_list,
+  formula_list = list(...),
+  prior_list = list(...),
   family_list = rep(NULL, 3),
   data = NULL,
   n_sim = 20,
@@ -15,7 +15,7 @@ metabmc(
   warmup = 5000,
   prior_model_prob = "uniform",
   eps = 0.001,
-  brms_arg_list = NULL,
+  brms_arg_list = list(...),
   verbosity = 1
 )
 }
@@ -41,6 +41,9 @@ metabmc(
 \item{eps}{Small number to be added / subtracted when posterior model probability takes 0 / 1}
 
 \item{brms_arg_list}{Additional argument to be passed to brms::brm when fitting model}
+
+\item{verbosity}{Verbosity level between 0 and 2. If 0, all the output is hidden. If 1 (default), only progress bar is
+shown. If 2, all the output is shown.}
 }
 \value{
 metabmc object which is to be passed to plotting function for inspection of uncertainty in posterior model probability.
