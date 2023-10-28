@@ -48,7 +48,7 @@ fit3 <- brm(m3, data=LakeHuron, prior = prior3, save_pars = save_pars(all = TRUE
 metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
 
 ## ---- eval=FALSE------------------------------------------------------------------------
-#  metabmc_fit <- metabmc(list(m1, m2, m3), list(prior1, prior2, prior3), data = LakeHuron, n_sim=20)
+#  metabmc_fit <- metabmc(list(m1, m2, m3), list(prior1, prior2, prior3), data = LakeHuron, n_sim=3)
 
 ## ---------------------------------------------------------------------------------------
 plot_simulated_pmp(metabmc_fit)

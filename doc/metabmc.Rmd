@@ -1,8 +1,6 @@
 ---
 title: "Estimating and visualizing meta-uncertainty with metabmc"
-author: 
-- "Marvin Schmitt"
-- "Yuga Hikida"
+author: "Yuga Hikida"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -107,7 +105,7 @@ metabmc_fit <- metabmc(fit1, fit2, fit3, n_sim=20)
 Alternatively, you can also specify your models as a list of prior distributions and brms formulas. In this case, all models are compiled and fit inside the `metabmc` function.
 
 ```{r, eval=FALSE}
-metabmc_fit <- metabmc(list(m1, m2, m3), list(prior1, prior2, prior3), data = LakeHuron, n_sim=20)
+metabmc_fit <- metabmc(list(m1, m2, m3), list(prior1, prior2, prior3), data = LakeHuron, n_sim=3)
 ```
 
 Firstly, we sample a "true model index" $M^*$ from our $J = 3$ candidates, according to the model prior $p(M)$. 
