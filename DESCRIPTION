@@ -13,9 +13,10 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     brms,
+    cmdstanr,
     dplyr,
     ggplot2,
-    ggsimplex,
+    ggsimplex (>= 0.0.1),
     latex2exp,
     purrr
 Suggests: 
@@ -26,3 +27,5 @@ Suggests:
 URL: https://meta-uncertainty.github.io
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Remotes:  
+    git::https://github.com/marvinschmitt/ggsimplex.git
